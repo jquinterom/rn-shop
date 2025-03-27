@@ -1,7 +1,9 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { ComponentProps } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../../providers/auth-provider";
 
 function TabBarIcons(pops: {
   name: ComponentProps<typeof FontAwesome>["name"];
@@ -18,6 +20,13 @@ function TabBarIcons(pops: {
 }
 
 const TabsLayout = () => {
+  const insets = useSafeAreaInsets();
+  const { session, mounting } = useAuth();
+
+  if (mounting) return <ActivityIndicator />;
+
+  if (!session) return <Redirect href={"/auth"} />;
+
   return (
     <Tabs
       screenOptions={{
@@ -28,6 +37,9 @@ const TabsLayout = () => {
         tabBarStyle: {
           paddingTop: Platform.OS === "ios" ? 10 : 0,
           height: Platform.OS === "ios" ? 60 : 50,
+        },
+        sceneStyle: {
+          paddingBottom: insets.bottom,
         },
       }}
     >
@@ -52,5 +64,3 @@ const TabsLayout = () => {
 };
 
 export default TabsLayout;
-
-const styles = StyleSheet.create({});
